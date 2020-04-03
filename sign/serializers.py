@@ -4,7 +4,7 @@ from rest_framework import serializers
 class EventSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Event
-		fields = ['name' , 'address' , 'strart_time' , 'limit' , 'status']
+		fields = ['name' , 'address' , 'start_time' , 'limit' , 'status']
 		
 class GuestSerializer(serializers.ModelSerializer):
 	class Meta:
