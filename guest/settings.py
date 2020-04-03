@@ -25,7 +25,7 @@ SECRET_KEY = 'cdad)b9#-5wti-y9kx1l(!1^)he0araradras%d0^buvr71u6d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -47,7 +47,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'sign',
+	'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+	#設定驗證方法，若沒有設定DEFAULT_AUTHENTICATION_CLASSES，會將request.user設定為instance of django.contrib.auth.models.AnonymousUser
+	'DEFAULT_AUTHENTICATION_CLASSES': (
+		'rest_framework_simplejwt.authentication.JWTAuthentication',
+	),
+	#設定test時，發出request的format
+	'TEST_REQUEST_DEFAULT_FORMAT': 'json'
+	}
 
 ROOT_URLCONF = 'guest.urls'
 
@@ -75,8 +86,15 @@ WSGI_APPLICATION = 'guest.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'guest',
+		'HOST': '127.0.0.1',
+		'PORT': '3306',
+		'USER': 'edgar',
+		'PASSWORD': 'ken2798315601',
+		'OPTIONS':{
+			'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+		},
     }
 }
 
@@ -103,9 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hant'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Taipei'
 
 USE_I18N = True
 
