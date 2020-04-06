@@ -103,7 +103,7 @@ REST_FRAMEWORK = {
 	]
 }
 ```
-在settings.py中設定所有view的驗證機制為json web token，permission為止有驗證過的user可以讀寫  
+在settings.py中設定所有view的驗證機制為json web token，permission為只有驗證過的user可以讀寫  
   
 ```
 SIMPLE_JWT = {
@@ -153,7 +153,7 @@ FLUSH PRIVILEGES;
 如此一來django即可連線到此資料庫  
   
 然後使用python manage.py makemigrations和python manage.py migrate這兩個指令  
-將models.py中定義好的資料結構建立到mysql中的database  
+將models.py中定義好的資料結構建立到mysql database中的table    
   
 因為要進行效能測試，資料庫中不會只有很少的資料  
 但是要手動增加幾千筆資料太過耗時  
