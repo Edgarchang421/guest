@@ -207,10 +207,9 @@ import json
 class UserBehavior(TaskSet):
 	
 	def on_start(self):
-		self.login()
+		self.get_json_web_token()
 		
-	def login(self):
-		'''
+	def basic_login(self):
 		##因為有CSRF保護機制，所以要先獲取CSRF token
 		response = self.client.get('/api-auth/login/')
 		csrftoken = response.cookies['csrftoken']
@@ -219,44 +218,66 @@ class UserBehavior(TaskSet):
 			{'username':'admin' , 'password':'password'},
 			headers={'X-CSRFToken': csrftoken}
 			)
-		'''	
 		
-		##改為json web token驗證
+	def get_json_web_token(self):	
+		##json web token驗證
 		jsonwebtoken_response = self.client.post('/api/token/', 
 			json={'username': 'admin', 'password': 'password'}
-		)
+			)
+		
 		self.json_web_token = json.loads(jsonwebtoken_response.text)
 		self.access_token = self.json_web_token['access']
 		self.refresh_token = self.json_web_token['refresh']
+		self.JWTheaders = {'Authorization': 'Bearer ' + self.access_token}
 	
 	def use_refresh_token_get_new_access_token(self):
-		use_refresh_token_response = self.client.post('/api/token/refresh/', 
+		refresh_token_response = self.client.post('/api/token/refresh/', 
 			json={'refresh':self.refresh_token}
 			)
-		refreshed_access_token = json.loads(use_refresh_token_response.text)
-		self.access_token = refreshed_access_token['access']
-	
-	@task
-	def event_list(self):
-		response = self.client.get('/Events/',headers = {'Authorization': 'Bearer ' + self.access_token})
-		if response.status_code == 401:
-			self.use_refresh_token_get_new_access_token()
-			
-	'''	
-	@task
-	def guest_list(self):
-		self.client.get('/Guests/?limit=50&offset=1000')
-	
-	@task
-	def event_detail(self):
-		self.client.get('/Event/' + str(random.randint(1,2)) +  '/')
 		
-	@task
+		refreshed_access_token = json.loads(refresh_token_response.text)
+		self.access_token = refreshed_access_token['access']
+		self.JWTheaders = {'Authorization': 'Bearer ' + self.access_token}
+	
+	@task(0)
+	def event_list(self):
+		with self.client.get('/Events/' , headers = self.JWTheaders) as response :
+			if response.status_code == 401:
+				self.use_refresh_token_get_new_access_token()
+		
+	@task(0)
+	def guest_list(self):
+		with self.client.get('/Guests/?limit=50&offset=1000' , headers = self.JWTheaders) as response :
+			if response.status_code == 401:
+				self.use_refresh_token_get_new_access_token()
+	
+	@task(0)
+	def event_detail(self):
+		with self.client.get('/Event/' + str(random.randint(1,2)) + '/' , headers = self.JWTheaders) as response :
+			if response.status_code == 401:
+				self.use_refresh_token_get_new_access_token()
+		
+	@task(0)
 	def guest_detail(self):
-		self.client.get('/Guest/7895/')
-	'''
+		with self.client.get('/Guest/7895/' , headers = self.JWTheaders) as response :
+			if response.status_code == 401:
+				self.use_refresh_token_get_new_access_token()
+				
+	@task(1)
+	def post_guest_list(self):
+		event = random.randint(1,2)
+		realname = 'ken' + str(random.randint(1,3001))
+		phone = 303150000 + random.randint(1,3001)
+		email = 'ken' + str(random.randint(1,3001)) + '@gmail.com'
+		sign = False
+		data = {'event' : event , 'realname' : realname , 'phone' : phone , 'email' : email , 'sign' : sign}
+		with self.client.post('/Guests/' , data = data ,headers = self.JWTheaders) as response:
+			if response.status_code == 401:
+				self.use_refresh_token_get_new_access_token()
+
 class WebsiteUser(HttpLocust):
 	task_set = UserBehavior
 	wait_time = between(3 , 6)
 ```
+
 

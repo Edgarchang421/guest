@@ -29,15 +29,15 @@ class UserBehavior(TaskSet):
 		self.JWTheaders = {'Authorization': 'Bearer ' + self.access_token}
 	
 	def use_refresh_token_get_new_access_token(self):
-		use_refresh_token_response = self.client.post('/api/token/refresh/', 
+		refresh_token_response = self.client.post('/api/token/refresh/', 
 			json={'refresh':self.refresh_token}
 			)
 		
-		refreshed_access_token = json.loads(use_refresh_token_response.text)
+		refreshed_access_token = json.loads(refresh_token_response.text)
 		self.access_token = refreshed_access_token['access']
 		self.JWTheaders = {'Authorization': 'Bearer ' + self.access_token}
 	
-	@task(1)
+	@task(0)
 	def event_list(self):
 		with self.client.get('/Events/' , headers = self.JWTheaders) as response :
 			if response.status_code == 401:
@@ -51,13 +51,25 @@ class UserBehavior(TaskSet):
 	
 	@task(0)
 	def event_detail(self):
-		with self.client.get('/Event/' + str(random.randint(1,2)) +  '/' , headers = self.JWTheaders) as response :
+		with self.client.get('/Event/' + str(random.randint(1,2)) + '/' , headers = self.JWTheaders) as response :
 			if response.status_code == 401:
 				self.use_refresh_token_get_new_access_token()
 		
 	@task(0)
 	def guest_detail(self):
 		with self.client.get('/Guest/7895/' , headers = self.JWTheaders) as response :
+			if response.status_code == 401:
+				self.use_refresh_token_get_new_access_token()
+				
+	@task(1)
+	def post_guest_list(self):
+		event = random.randint(1,2)
+		realname = 'ken' + str(random.randint(1,3001))
+		phone = 303150000 + random.randint(1,3001)
+		email = 'ken' + str(random.randint(1,3001)) + '@gmail.com'
+		sign = False
+		data = {'event' : event , 'realname' : realname , 'phone' : phone , 'email' : email , 'sign' : sign}
+		with self.client.post('/Guests/' , data = data ,headers = self.JWTheaders) as response:
 			if response.status_code == 401:
 				self.use_refresh_token_get_new_access_token()
 
