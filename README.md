@@ -133,7 +133,7 @@ ordering = ['id']
 ordering_fields是允許排序的field  
 ordering是default的排序用field  
 
-然後可以使用SQL在MYSQL中確認 id 是否有建立 index  
+然後可以使用SQL statement在MYSQL中確認 id 是否有建立 index  
 ```
 SHOW INDEXES from `tablename`;
 ```
@@ -141,7 +141,7 @@ SHOW INDEXES from `tablename`;
 ```
 ALTER TABLE `tablename` ADD INDEX ( `indexname` );
 ```
-設定完之後，GET /Guests/ 就會有帶有cursor的next URL可以取的下一頁的資料了  
+設定完之後，GET /Guests/ 就會有帶有cursor的next URL可以取得下一頁的資料了  
   
 ```
 SIMPLE_JWT = {
