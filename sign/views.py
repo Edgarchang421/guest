@@ -11,7 +11,7 @@ class EventDetail(generics.RetrieveUpdateDestroyAPIView):
 	serializer_class = EventSerializer
 	
 class GuestList(generics.ListCreateAPIView):
-	permission_classes = [permissions.AllowAny]
+	#permission_classes = [permissions.AllowAny]
 	queryset = Guest.objects.all()
 	serializer_class = GuestSerializer
 	

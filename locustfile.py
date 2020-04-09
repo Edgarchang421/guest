@@ -60,18 +60,6 @@ class UserBehavior(TaskSet):
 		with self.client.get('/Guest/7895/' , headers = self.JWTheaders) as response :
 			if response.status_code == 401:
 				self.use_refresh_token_get_new_access_token()
-				
-	@task(1)
-	def post_guest_list(self):
-		event = random.randint(1,2)
-		realname = 'ken' + str(random.randint(1,3001))
-		phone = 303150000 + random.randint(1,3001)
-		email = 'ken' + str(random.randint(1,3001)) + '@gmail.com'
-		sign = False
-		data = {'event' : event , 'realname' : realname , 'phone' : phone , 'email' : email , 'sign' : sign}
-		with self.client.post('/Guests/' , data = data ,headers = self.JWTheaders) as response:
-			if response.status_code == 401:
-				self.use_refresh_token_get_new_access_token()
 
 class WebsiteUser(HttpLocust):
 	task_set = UserBehavior
