@@ -108,7 +108,42 @@ REST_FRAMEWORK = {
 ```
 在settings.py中設定所有view的驗證機制為json web token，permission權限設定為只有驗證過的user可以讀寫   
   
-DEFAULT_PAGINATION_CLASS將API的分頁設定為偏移植分頁法，客戶端可以在URL使用limit和offset參數進行分頁  
+DEFAULT_PAGINATION_CLASS將API的分頁設定為CursorPagination  
+CursorPagination相較於LimitOffsetPagination最大的好處是，不會因為資料表過大而導致降地效能  
+  
+要使用CursorPagination有些地方要稍加注意，第一件事是應該要使用甚麼ordeing排序，在REST framework中的default是 '-created'  
+這是建立在假設model instances上會有一個 'created' 的時間戳記timestamp field，並且會顯示成 'timeline'style paginated view  
+  
+但是也可以透過使用override pagination class 中的 'ordering' attribute  
+或者是同時使用 CursorPagination 和 OrderingFilter filter class , 即可在view中指定允許進行排序和用來排序的field  
+
+有了ordering field之後，還需要確定以下的注意事項，才能將cursor pagination的效用完整發揮  
+
+1. ordering field在建立instance之後就不應該被改變，例如timestamp、slug。    
+2. ordering field應該要具有唯一性，或者是幾乎唯一，有道毫秒精度的時間戳就是一個很好的例子。  
+3. ordering field應該是可以被強制轉換為string的non-nullable value。  
+4. ordering field不應該使用float，會很容易導致錯誤，可以改為使用decimals。
+5. ordering field需要有database的index。  
+
+因為這些原因，我選擇使用django在建立model instance時會自動新增的 'id' 作為ordering field   
+所以先在view中加上filter class
+```
+ordering_fields = ['id']
+ordering = ['id']
+```
+ordering_fields是允許排序的field  
+ordering是default的排序用field  
+
+然後可以使用SQL在MYSQL中確認 id 是否有建立 index  
+```
+SHOW INDEXES from `tablename`;
+```
+因為id是主鍵，所以已經建立好index了，如果需要使用別的field建立index，可以使用以下statement  
+```
+ALTER TABLE `tablename` ADD INDEX ( `indexname` );
+```
+設定完之後，GET /Guests/ 就會有帶有cursor的next URL可以取的下一頁的資料了  
+  
 ```
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
