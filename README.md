@@ -101,9 +101,8 @@ REST_FRAMEWORK = {
 	'DEFAULT_AUTHENTICATION_CLASSES': [
 		'rest_framework_simplejwt.authentication.JWTAuthentication',
 	],
-	'DEFAULT_PAGINATION_CLASS': 
-		'rest_framework.pagination.LimitOffsetPagination'
-	,
+	'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.CursorPagination',
+	'PAGE_SIZE': 100,
 }
 ```
 在settings.py中設定所有view的驗證機制為json web token，permission權限設定為只有驗證過的user可以讀寫   
