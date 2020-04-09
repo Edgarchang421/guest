@@ -99,12 +99,16 @@ REST_FRAMEWORK = {
 		'rest_framework.permissions.IsAuthenticated',
 	],
 	'DEFAULT_AUTHENTICATION_CLASSES': [
-		'rest_framework_simplejwt.authentication.JWTAuthentication'
-	]
+		'rest_framework_simplejwt.authentication.JWTAuthentication',
+	],
+	'DEFAULT_PAGINATION_CLASS': 
+		'rest_framework.pagination.LimitOffsetPagination'
+	,
 }
 ```
-在settings.py中設定所有view的驗證機制為json web token，permission權限設定為只有驗證過的user可以讀寫  
+在settings.py中設定所有view的驗證機制為json web token，permission權限設定為只有驗證過的user可以讀寫   
   
+DEFAULT_PAGINATION_CLASS將API的分頁設定為偏移植分頁法，客戶端可以在URL使用limit和offset參數進行分頁  
 ```
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
