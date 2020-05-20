@@ -185,7 +185,7 @@ CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'newpassword';
   
 新增好user之後，使用root帳號新增資料庫  
   
-CREATE DATABASE 'newdatabase';  
+CREATE DATABASE 'newdatabase' CHARACTER SET utf8;  
 
 給予新增的user此資料庫的讀寫權限  
   
